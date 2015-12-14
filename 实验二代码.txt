@@ -1,0 +1,89 @@
+SET SERVEROUTPUT ON;-- 打开显示开关
+-- 实验一
+DECLARE
+  eno emp.empno%TYPE;
+  ename emp.ename%TYPE;
+  ejob emp.job%TYPE;
+  emgr emp.mgr%TYPE;
+  ehire emp.hiredate%TYPE;
+  esal emp.sal%TYPE;
+  ecomm emp.comm%TYPE;
+  edeptno emp.deptno%TYPE;
+BEGIN
+  eno:=&no;
+  SELECT empno, ename, job, mgr, hiredate, sal, comm, deptno
+  INTO   eno, ename, ejob, emgr, ehire, esal, ecomm, edeptno
+  FROM emp
+  WHERE empno = eno;
+  dbms_output.put_line(to_char(eno)||','||to_char(ename)||','||to_char(ejob)||','||to_char(emgr)||','||to_char(ehire)||','||to_char(esal)||','||to_char(ecomm)||','||to_char(edeptno));
+END;
+
+-- 实验二
+DECLARE
+  a number(1);
+  b number(1);
+  c number(1);
+  ave number(2);
+  ans number(2);
+BEGIN
+  a := &num1;
+  b := &num2;
+  c := &num3;
+  ave := (a + b + c) / 3;
+  ans := a * b * c;
+  dbms_output.put_line('平均数：'||ave||' '||'积：'||ans);
+END;
+
+--实验三
+DECLARE
+  eename emp.ename%TYPE;
+  ejob emp.job%TYPE;
+  esal emp.sal%TYPE;
+BEGIN
+  eename := 'SCOTT';
+  SELECT job, sal
+  INTO  ejob, esal
+  FROM emp
+  WHERE ename = eename;
+
+  IF ejob = 'MANAGER' THEN
+    esal := esal * 1.2;
+  ELSIF ejob = 'SALESMAN' THEN
+    esal := esal * 1.15;
+  ELSIF ejob = 'ANALYST' THEN
+    esal := esal * 1.1;
+  ELSE
+    esal := esal * 1.07;
+  END IF;
+
+  -- 将更新后的数据修改回数据库
+  UPDATE emp
+  SET sal = esal
+  WHERE ename = eename;
+  COMMIT;
+END;
+
+
+-- 实验四
+DECLARE
+   v_add_sal emp.sal%TYPE;
+BEGIN
+  FOR v_temp IN (
+    SELECT deptno, ename
+    FROM emp
+    )
+
+  LOOP
+     IF v_temp.deptno = 30 THEN
+       v_add_sal := 150;
+     ELSIF v_temp.deptno = 20 THEN
+       v_add_sal := 250;
+     ELSIF v_temp.deptno = 10 THEN
+       v_add_sal := 350;
+     END IF;
+     update emp
+     SET sal = sal + v_add_sal
+     WHERE v_temp.deptno = deptno AND v_temp.ename = ename;
+  END LOOP;
+  COMMIT WORK;
+END;
